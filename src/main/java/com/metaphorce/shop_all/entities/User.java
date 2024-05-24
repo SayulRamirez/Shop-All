@@ -19,7 +19,13 @@ public class User {
 
     private String name;
 
+    @Column(unique = true)
     private String email;
 
     private boolean active;
+
+    @PrePersist
+    public void prePersist() {
+        this.active = true;
+    }
 }
