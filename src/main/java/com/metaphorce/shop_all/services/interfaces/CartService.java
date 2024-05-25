@@ -14,5 +14,4 @@ public interface CartService {
 
     void deleteProduct(Long productId, Long userId);
 
-    SaleResponse shopProducts(SaleRequest saleRequest);
 }

@@ -116,11 +116,6 @@ public class CartServiceImpl implements CartService {
         updateCart(cart);
     }
 
-    @Override
-    public SaleResponse shopProducts(SaleRequest saleRequest) {
-        return null;
-    }
-
     private void existsUser(Long id) {
 
         if (!userRepository.existsUserByIdAndActiveIsTrue(id)) {
