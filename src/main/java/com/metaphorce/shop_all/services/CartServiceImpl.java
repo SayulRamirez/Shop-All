@@ -14,6 +14,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,7 +83,23 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public List<CartDetailsResponse> getDetailsCart(Long userId) {
-        return List.of();
+
+        Long idCart = cartRepository.getIdByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
+
+        List<CartDetails> details = cartDetailsRepository.findCartDetailsByCartId(idCart);
+
+        List<CartDetailsResponse> response = new ArrayList<>();
+
+        details.forEach(d ->
+                response.add(new CartDetailsResponse(
+                        d.getProduct().getDescription(),
+                        d.getProduct().getCode(),
+                        d.getProduct().getCategory(),
+                        d.getNumberPieces(),
+                        d.getAmount()
+                )));
+
+        return response;
     }
 
     @Override
