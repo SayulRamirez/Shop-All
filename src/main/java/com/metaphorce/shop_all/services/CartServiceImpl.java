@@ -1,0 +1,110 @@
+package com.metaphorce.shop_all.services;
+
+import com.metaphorce.shop_all.domain.*;
+import com.metaphorce.shop_all.entities.Cart;
+import com.metaphorce.shop_all.entities.CartDetails;
+import com.metaphorce.shop_all.entities.Product;
+import com.metaphorce.shop_all.exceptions.NotEnoughStock;
+import com.metaphorce.shop_all.repositories.CartDetailsRepository;
+import com.metaphorce.shop_all.repositories.CartRepository;
+import com.metaphorce.shop_all.repositories.ProductRepository;
+import com.metaphorce.shop_all.repositories.UserRepository;
+import com.metaphorce.shop_all.services.interfaces.CartService;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+public class CartServiceImpl implements CartService {
+
+    private final UserRepository userRepository;
+
+    private final CartRepository cartRepository;
+
+    private final ProductRepository productRepository;
+
+    private final CartDetailsRepository cartDetailsRepository;
+
+    public CartServiceImpl(UserRepository userRepository, CartRepository cartRepository,
+                           ProductRepository productRepository, CartDetailsRepository cartDetailsRepository) {
+        this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
+        this.productRepository = productRepository;
+        this.cartDetailsRepository = cartDetailsRepository;
+
+    }
+
+    @Transactional
+    @Override
+    public void addProduct(AddCartRequest request) {
+
+        existsUser(request.user_id());
+
+        Product product = productRepository.findById(request.product_id())
+                .orElseThrow(() -> new EntityNotFoundException("Product not found whit id: " + request.product_id()));
+
+
+        Integer stock = product.getStock();
+
+        if (stock < request.pieces()) {
+            throw new NotEnoughStock("Not enough stock, only" + stock + " pieces");
+        }
+
+        Cart cart = cartRepository.findCartByUser(request.user_id()).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
+
+        CartDetails details = CartDetails.builder()
+                .cart(cart)
+                .product(product)
+                .numberPieces(request.pieces())
+                .amount(request.pieces() * product.getPrice()).build();
+
+        cartDetailsRepository.save(details);
+
+        updateCart(cart);
+    }
+
+    @Override
+    public CartResponse getCart(Long userId) {
+        return null;
+    }
+
+    @Override
+    public List<CartDetailsResponse> getDetailsCart(Long userId) {
+        return List.of();
+    }
+
+    @Override
+    public void deleteProduct(Long productId, Long userId) {
+
+    }
+
+    @Override
+    public SaleResponse shopProducts(SaleRequest saleRequest) {
+        return null;
+    }
+
+    private void existsUser(Long id) {
+
+        if (!userRepository.existsUserByIdAndActiveIsTrue(id)) {
+            throw new EntityNotFoundException("User not found");
+        }
+    }
+
+    private void updateCart(Cart cart) {
+        Optional<Integer> numberProducts = cartDetailsRepository.sumNumberProducts(cart.getId());
+        Optional<Double> amount = cartDetailsRepository.sumAmount(cart.getId());
+
+        if (numberProducts.isPresent() && amount.isPresent()) {
+            cart.setNumberProducts(numberProducts.get());
+            cart.setAmount(amount.get());
+        } else {
+            cart.setNumberProducts(0);
+            cart.setAmount(0.0);
+        }
+
+        cartRepository.save(cart);
+    }
+}
