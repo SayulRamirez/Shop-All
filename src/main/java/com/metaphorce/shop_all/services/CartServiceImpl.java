@@ -54,15 +54,29 @@ public class CartServiceImpl implements CartService {
             throw new NotEnoughStock("Not enough stock, only" + stock + " pieces");
         }
 
+
         Cart cart = cartRepository.findCartByUser(request.user_id()).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
-        CartDetails details = CartDetails.builder()
-                .cart(cart)
-                .product(product)
-                .numberPieces(request.pieces())
-                .amount(request.pieces() * product.getPrice()).build();
+        Optional<Long> idCartDetails = cartDetailsRepository.getId(product.getId(), cart.getId());
 
-        cartDetailsRepository.save(details);
+        if (idCartDetails.isEmpty()) {
+
+            CartDetails details = CartDetails.builder()
+                    .cart(cart)
+                    .product(product)
+                    .numberPieces(request.pieces())
+                    .amount(request.pieces() * product.getPrice()).build();
+
+            cartDetailsRepository.save(details);
+
+        } else {
+            CartDetails details = cartDetailsRepository.findById(idCartDetails.get()).orElseThrow(() -> new EntityNotFoundException("Cart details not found"));
+
+            details.setNumberPieces(request.pieces());
+            details.setAmount(request.pieces() * product.getPrice());
+
+            cartDetailsRepository.save(details);
+        }
 
         updateCart(cart);
     }
@@ -102,6 +116,7 @@ public class CartServiceImpl implements CartService {
         return response;
     }
 
+    @Transactional
     @Override
     public void deleteProduct(Long productId, Long userId) {
 
