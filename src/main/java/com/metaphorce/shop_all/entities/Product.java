@@ -22,6 +22,7 @@ public class Product {
 
     private String code;
 
+    @Enumerated(EnumType.STRING)
     private Category category;
 
     private Integer stock;
