@@ -105,6 +105,15 @@ public class CartServiceImpl implements CartService {
     @Override
     public void deleteProduct(Long productId, Long userId) {
 
+        existsUser(userId);
+
+        Cart cart = cartRepository.findCartByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
+
+        Long cartDetailsId = cartDetailsRepository.getId(productId, cart.getId()).orElseThrow(() -> new EntityNotFoundException("cart details not found"));
+
+        cartDetailsRepository.deleteById(cartDetailsId);
+
+        updateCart(cart);
     }
 
     @Override
