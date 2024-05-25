@@ -68,7 +68,16 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public CartResponse getCart(Long userId) {
-        return null;
+
+        existsUser(userId);
+
+        Cart cart = cartRepository.findCartByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
+
+        return new CartResponse(
+                cart.getUser().getName(),
+                cart.getNumberProducts(),
+                cart.getAmount()
+        );
     }
 
     @Override
