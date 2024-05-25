@@ -19,4 +19,7 @@ public interface CartDetailsRepository extends JpaRepository<CartDetails, Long> 
 
     @Query("select c from CartDetails c where c.cart.id =:cart")
     List<CartDetails> findCartDetailsByCartId(Long cart);
+
+    @Query("select c.id from CartDetails c where c.cart.id =:cartId and c.product.id =:productId")
+    Optional<Long> getId(Long productId, Long cartId);
 }
