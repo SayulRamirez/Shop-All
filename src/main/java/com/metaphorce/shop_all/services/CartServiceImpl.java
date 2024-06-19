@@ -4,7 +4,7 @@ import com.metaphorce.shop_all.domain.*;
 import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.CartDetails;
 import com.metaphorce.shop_all.entities.Product;
-import com.metaphorce.shop_all.exceptions.NotEnoughStock;
+import com.metaphorce.shop_all.exceptions.NotEnoughStockException;
 import com.metaphorce.shop_all.repositories.CartDetailsRepository;
 import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.ProductRepository;
@@ -51,7 +51,7 @@ public class CartServiceImpl implements CartService {
         Integer stock = product.getStock();
 
         if (stock < request.pieces()) {
-            throw new NotEnoughStock("Not enough stock, only" + stock + " pieces");
+            throw new NotEnoughStockException("Not enough stock, only" + stock + " pieces");
         }
 
 
