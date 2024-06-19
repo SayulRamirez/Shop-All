@@ -1,8 +1,8 @@
 package com.metaphorce.shop_all.exceptions;
 
-public class NotEnoughStock extends RuntimeException {
+public class NotEnoughStockException extends RuntimeException {
 
-    public NotEnoughStock(String message) {
+    public NotEnoughStockException(String message) {
         super(message);
     }
 
