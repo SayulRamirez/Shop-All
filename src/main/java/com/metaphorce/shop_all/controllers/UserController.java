@@ -6,7 +6,12 @@ import com.metaphorce.shop_all.services.UserServiceImpl;
 import com.metaphorce.shop_all.services.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,13 +34,14 @@ public class UserController {
 
     @Operation(summary = "Registra un nuevo usuario", description = "Registra un nuevo usuario y devolvera el usuario registrado, si el usuario ya tiene registrado el email se lanzara un error")
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@RequestBody UserRequest request) {
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest request) {
         return ResponseEntity.ok(userService.register(request));
     }
 
     @Operation(summary = "Inactiva un usuario", description = "Elimina o mejor dicho pone en inactivo al usuario mediante su id, si no lo encuetra lanzara un error.")
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteUser(@Valid @NotNull(message = "The field must not be null") @Min(message = "The value must be greater that 0", value = 1)
+                                               @PathVariable Long id) {
         userService.deleteUser(id);
 
         return ResponseEntity.notFound().build();
