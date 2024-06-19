@@ -2,6 +2,7 @@ package com.metaphorce.shop_all.controllers;
 
 import com.metaphorce.shop_all.domain.ExceptionResponse;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -46,4 +47,13 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ExceptionResponse> handleEntityNotFoundException(EntityNotFoundException exception) {
+        ExceptionResponse response = ExceptionResponse.builder()
+                .message(exception.getMessage())
+                .status(HttpStatus.NOT_FOUND)
+                .timestamp(ZonedDateTime.now(ZoneId.of("America/Chicago"))).build();
+
+        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+    }
 }
