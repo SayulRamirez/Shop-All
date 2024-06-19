@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,7 +24,7 @@ public class CartController {
         this.cartService = cartService;
     }
 
-    @Operation(summary = "Agrega productos al carrito", description = "Agrega los productos al carrito utilizando su id, el id del usuario y la cantidad de pizas del producto")
+    @Operation(summary = "Add products to cart", description = "Add the products to the cart using their ID, user ID, and number of product pieces")
     @PostMapping("/add")
     public ResponseEntity<Void> addProductToCart(@Valid  @RequestBody AddCartRequest request) {
         cartService.addProduct(request);
@@ -33,7 +32,7 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "Obtiene los detalles generales del carrito")
+    @Operation(summary = "Get the general cart details")
     @GetMapping(path = "/general/{id}")
     public ResponseEntity<CartResponse> getCart(@Valid @NotNull(message = "The field must not be null") @Min(message = "The value must be greater that 0", value = 1)
                                                     @PathVariable Long id) {
@@ -42,7 +41,7 @@ public class CartController {
         return ResponseEntity.ok(cart);
     }
 
-    @Operation(summary = "Obtiene los detalles del carrito", description = "Obtiene los detalles especifícos del carrito de un usuario por medio de su id")
+    @Operation(summary = "Get the cart details", description = "Get specific cart details from a user using their id")
     @GetMapping(path = "/details/{userId}")
     public ResponseEntity<List<CartDetailsResponse>> getDetailsCart(@Valid @NotNull(message = "The field must not be null") @Min(message = "The value must be greater that 0", value = 1)
                                                                         @PathVariable Long userId) {
@@ -50,7 +49,7 @@ public class CartController {
         return ResponseEntity.ok(cartService.getDetailsCart(userId));
     }
 
-    @Operation(summary = "Remueve un producto del carrito", description = "Remueve un producto del carrito del usuario por medio del id del usuario y el producto")
+    @Operation(summary = "Remove a product form the cart", description = "Remove a product from the user's cart using the user ID and the product")
     @DeleteMapping(path = "/user/{userId}/product/{productId}")
     public ResponseEntity<Void> removeProduct(@Valid @NotNull(message = "The field must not be null") @Min(message = "The value must be greater that 0", value = 1)
                                                   @PathVariable Long userId,
