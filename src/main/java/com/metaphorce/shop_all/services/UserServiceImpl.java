@@ -10,6 +10,7 @@ import com.metaphorce.shop_all.services.interfaces.UserService;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
         return response;
     }
 
+    @Transactional
     @Override
     public UserResponse register(UserRequest request) {
 
@@ -56,6 +58,7 @@ public class UserServiceImpl implements UserService {
         return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isActive());
     }
 
+    @Transactional
     @Override
     public void deleteUser(Long id) {
 
