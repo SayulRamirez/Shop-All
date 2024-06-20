@@ -47,36 +47,35 @@ public class CartServiceImpl implements CartService {
         Product product = productRepository.findById(request.product_id())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found whit id: " + request.product_id()));
 
-
         Integer stock = product.getStock();
 
         if (stock < request.pieces()) {
             throw new NotEnoughStockException("Not enough stock, only" + stock + " pieces");
         }
 
-
         Cart cart = cartRepository.findCartByUser(request.user_id()).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
         Optional<Long> idCartDetails = cartDetailsRepository.getId(product.getId(), cart.getId());
 
+        CartDetails details;
+
         if (idCartDetails.isEmpty()) {
 
-            CartDetails details = CartDetails.builder()
+            details = CartDetails.builder()
                     .cart(cart)
                     .product(product)
                     .numberPieces(request.pieces())
                     .amount(request.pieces() * product.getPrice()).build();
 
-            cartDetailsRepository.save(details);
-
         } else {
-            CartDetails details = cartDetailsRepository.findById(idCartDetails.get()).orElseThrow(() -> new EntityNotFoundException("Cart details not found"));
+            details = cartDetailsRepository.findById(idCartDetails.get()).orElseThrow(() -> new EntityNotFoundException("Cart details not found"));
 
             details.setNumberPieces(request.pieces());
             details.setAmount(request.pieces() * product.getPrice());
 
-            cartDetailsRepository.save(details);
         }
+
+        cartDetailsRepository.save(details);
 
         updateCart(cart);
     }
