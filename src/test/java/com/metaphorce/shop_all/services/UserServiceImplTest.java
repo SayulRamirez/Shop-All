@@ -6,6 +6,7 @@ import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
+import jakarta.persistence.EntityExistsException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,8 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -70,5 +70,15 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).save(any(User.class));
         verify(cartRepository, times(1)).save(any(Cart.class));
 
+    }
+
+    @Test
+    void whenTheUserAlreadyExists() {
+        UserRequest request = new UserRequest("repeated", "juan1234@example.com");
+
+        when(userRepository.existsByEmail(request.email())).thenReturn(true);
+
+        assertThrows(EntityExistsException.class, () -> underTest.register(request));
+        verify(userRepository, times(1)).existsByEmail(any(String.class));
     }
 }
