@@ -7,6 +7,7 @@ import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.verification.VerificationMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -110,5 +112,29 @@ public class UserServiceImplTest {
         verify(userRepository, times(1)).findAll();
         assertFalse(responses.isEmpty());
         assertEquals(2, responses.size());
+    }
+
+    @Test
+    void whenUnsubscribingAUserDoesNotExist() {
+
+        Long id = 1L;
+
+        assertThrows(EntityNotFoundException.class, () -> underTest.deleteUser(id));
+        verify(userRepository, times(1)).findById(any(Long.class));
+    }
+
+    @Test
+    void whenUnsubscribingAUserIsSuccessful() {
+
+        User user = User.builder().id(1L).name("juan").email("juan@example.com").build();
+
+        userRepository.save(user);
+
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
+
+        underTest.deleteUser(user.getId());
+
+        verify(userRepository, times(2)).save(any(User.class));
+        assertFalse(user.isActive());
     }
 }
