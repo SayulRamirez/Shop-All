@@ -17,6 +17,8 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -80,5 +82,33 @@ public class UserServiceImplTest {
 
         assertThrows(EntityExistsException.class, () -> underTest.register(request));
         verify(userRepository, times(1)).existsByEmail(any(String.class));
+    }
+
+    @Test
+    void whenGetAllUsersIsEmpty() {
+
+        when(userRepository.findAll()).thenReturn(new ArrayList<>());
+
+        List<UserResponse> response = underTest.getAll();
+
+        verify(userRepository, times(1)).findAll();
+        assertTrue(response.isEmpty());
+    }
+
+    @Test
+    void whenGetAllUserIsNotEmpty() {
+
+        List<User> users = List.of(
+                User.builder().name("first user").email("first@example.com").build(),
+                User.builder().name("second user").email("second@example.com").build()
+        );
+
+        when(userRepository.findAll()).thenReturn(users);
+
+        List<UserResponse> responses = underTest.getAll();
+
+        verify(userRepository, times(1)).findAll();
+        assertFalse(responses.isEmpty());
+        assertEquals(2, responses.size());
     }
 }
