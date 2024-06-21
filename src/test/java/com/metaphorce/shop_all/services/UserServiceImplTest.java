@@ -8,16 +8,12 @@ import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.verification.VerificationMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +40,9 @@ public class UserServiceImplTest {
         // give
         UserRequest request = new UserRequest("juan", "juan1234@example.com");
 
+        User user = User.builder().id(1L).name(request.name()).email(request.email()).active(true).build();
         // when
+        when(userRepository.save(any(User.class))).thenReturn(user);
         underTest.register(request);
 
         // that
@@ -52,7 +50,6 @@ public class UserServiceImplTest {
         verify(userRepository).save(argumentCaptor.capture());
 
         User requestCaptured = argumentCaptor.getValue();
-        User user = User.builder().name(request.name()).email(request.email()).build();
 
         assertEquals(user.getName(), requestCaptured.getName());
         assertEquals(user.getEmail(), requestCaptured.getEmail());
