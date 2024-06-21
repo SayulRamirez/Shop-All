@@ -45,11 +45,10 @@ public class UserServiceImpl implements UserService {
             throw new EntityExistsException("User already exists");
         }
 
-        User user = User.builder()
-                .name(request.name())
-                .email(request.email()).build();
-
-        userRepository.save(user);
+        User user = userRepository.save(
+                User.builder()
+                        .name(request.name())
+                        .email(request.email()).build());
 
         Cart cart = Cart.builder().user(user).build();
 
