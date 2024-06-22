@@ -14,6 +14,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -45,5 +47,20 @@ public class CartServiceImplTest {
         assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
         verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
         verify(productRepository, never()).findById(any(Long.class));
+    }
+
+    @Test
+    void whenAddProductTheUserExistsButNotProduct() {
+
+        AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+
+        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+
+        when(productRepository.findById(any(Long.class))).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
+        verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
+        verify(productRepository, times(1)).findById(any(Long.class));
+        verify(cartRepository, never()).findCartByUser(any(Long.class));
     }
 }
