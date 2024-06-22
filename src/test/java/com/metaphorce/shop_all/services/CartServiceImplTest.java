@@ -1,6 +1,7 @@
 package com.metaphorce.shop_all.services;
 
 import com.metaphorce.shop_all.domain.AddCartRequest;
+import com.metaphorce.shop_all.domain.CartDetailsResponse;
 import com.metaphorce.shop_all.domain.CartResponse;
 import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.CartDetails;
@@ -18,6 +19,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -147,4 +150,23 @@ public class CartServiceImplTest {
         assertEquals(cart.getNumberProducts(), response.number_products());
         assertEquals(cart.getAmount(), response.amount());
     }
+
+    // obtener detalles del carrito vacio
+    @Test
+    void whenTheyAskForGeneralCartDetailsUserNotExists() {
+
+        Long id = 1L;
+        List<CartDetails> cartDetails = new ArrayList<>();
+
+        when(cartRepository.getIdByUser(any(Long.class))).thenReturn(Optional.of(id));
+
+        when(cartDetailsRepository.findCartDetailsByCartId(id)).thenReturn(cartDetails);
+
+        List<CartDetailsResponse> responses = underTest.getDetailsCart(1L);
+
+        assertTrue(responses.isEmpty());
+        verify(cartDetailsRepository, times(1)).findCartDetailsByCartId(any(Long.class));
+    }
+
+    // obtener detarlles del carrito con productos
 }
