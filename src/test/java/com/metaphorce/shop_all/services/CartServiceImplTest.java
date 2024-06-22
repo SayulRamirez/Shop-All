@@ -7,6 +7,7 @@ import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.CartDetails;
 import com.metaphorce.shop_all.entities.Product;
 import com.metaphorce.shop_all.entities.User;
+import com.metaphorce.shop_all.enums.Category;
 import com.metaphorce.shop_all.exceptions.NotEnoughStockException;
 import com.metaphorce.shop_all.repositories.CartDetailsRepository;
 import com.metaphorce.shop_all.repositories.CartRepository;
@@ -168,6 +169,32 @@ public class CartServiceImplTest {
     }
 
     // obtener detarlles del carrito con productos
+    @Test
+    void whenYouGetTheCartDetailsIsSuccessful() {
 
+        Long id = 1L;
+        List<CartDetails> cartDetails = List.of(
+                CartDetails.builder()
+                        .product(Product.builder().description("Heineken 355 ml lata")
+                                .code("1234").category(Category.CERVEZA).build())
+                        .numberPieces(2)
+                        .amount(48.80).build(),
+                CartDetails.builder().product(
+                        Product.builder().description("Kosako 2 litros botella pet")
+                                .code("8901").category(Category.CERVEZA).build())
+                        .numberPieces(1)
+                        .amount(110.60).build()
+        );
+
+        when(cartRepository.getIdByUser(any(Long.class))).thenReturn(Optional.of(id));
+
+        when(cartDetailsRepository.findCartDetailsByCartId(id)).thenReturn(cartDetails);
+
+        List<CartDetailsResponse> responses = underTest.getDetailsCart(1L);
+
+        assertFalse(responses.isEmpty());
+        assertEquals(2, responses.size());
+        verify(cartDetailsRepository, times(1)).findCartDetailsByCartId(any(Long.class));
+    }
 }
 
