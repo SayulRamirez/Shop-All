@@ -96,7 +96,7 @@ public class CartServiceImplTest {
         Product product = Product.builder()
                 .id(1L).stock(6).price(24.40).build();
 
-        Cart cart = Cart.builder().id(1L).user(User.builder().id(1L).build()).numberProducts(1).amount(24.40).build();
+        Cart cart = Cart.builder().id(1L).numberProducts(1).amount(24.40).build();
 
         when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
 
@@ -120,7 +120,7 @@ public class CartServiceImplTest {
         Product product = Product.builder()
                 .id(1L).stock(6).price(24.40).build();
 
-        Cart cart = Cart.builder().id(1L).user(User.builder().id(1L).build()).numberProducts(1).amount(24.40).build();
+        Cart cart = Cart.builder().id(1L).numberProducts(1).amount(24.40).build();
 
         when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
 
@@ -138,16 +138,17 @@ public class CartServiceImplTest {
     @Test
     void whenTheyAskForGeneralCartDetails() {
         Cart cart = Cart.builder()
-                .user(User.builder().name("juan").build())
                 .numberProducts(2)
                 .amount(45.42).build();
 
+        User user = User.builder().name("juan").cart(cart).build();
+
         when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
-        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
 
         CartResponse response = underTest.getCart(1L);
 
-        assertEquals(cart.getUser().getName(), response.name());
+        assertEquals(user.getName(), response.name());
         assertEquals(cart.getNumberProducts(), response.number_products());
         assertEquals(cart.getAmount(), response.amount());
     }
@@ -168,7 +169,6 @@ public class CartServiceImplTest {
         verify(cartDetailsRepository, times(1)).findCartDetailsByCartId(any(Long.class));
     }
 
-    // obtener detarlles del carrito con productos
     @Test
     void whenYouGetTheCartDetailsIsSuccessful() {
 
@@ -202,7 +202,6 @@ public class CartServiceImplTest {
 
         Cart cart = Cart.builder()
                 .id(1L)
-                .user(User.builder().name("juan").build())
                 .numberProducts(3)
                 .amount(160.40).build();
 

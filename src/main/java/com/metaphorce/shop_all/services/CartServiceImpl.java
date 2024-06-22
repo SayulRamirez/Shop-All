@@ -4,6 +4,7 @@ import com.metaphorce.shop_all.domain.*;
 import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.CartDetails;
 import com.metaphorce.shop_all.entities.Product;
+import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.exceptions.NotEnoughStockException;
 import com.metaphorce.shop_all.repositories.CartDetailsRepository;
 import com.metaphorce.shop_all.repositories.CartRepository;
@@ -85,12 +86,12 @@ public class CartServiceImpl implements CartService {
 
         existsUser(userId);
 
-        Cart cart = cartRepository.findCartByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found whit ID: " + userId));
 
         return new CartResponse(
-                cart.getUser().getName(),
-                cart.getNumberProducts(),
-                cart.getAmount()
+                user.getName(),
+                user.getCart().getNumberProducts(),
+                user.getCart().getAmount()
         );
     }
 

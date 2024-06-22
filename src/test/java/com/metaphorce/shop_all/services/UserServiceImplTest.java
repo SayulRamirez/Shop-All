@@ -2,9 +2,7 @@ package com.metaphorce.shop_all.services;
 
 import com.metaphorce.shop_all.domain.UserRequest;
 import com.metaphorce.shop_all.domain.UserResponse;
-import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.User;
-import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
@@ -27,9 +25,6 @@ public class UserServiceImplTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private CartRepository cartRepository;
 
     @InjectMocks
     private UserServiceImpl underTest;
@@ -69,8 +64,6 @@ public class UserServiceImplTest {
         assertEquals(user.getEmail(), response.email());
 
         verify(userRepository, times(1)).save(any(User.class));
-        verify(cartRepository, times(1)).save(any(Cart.class));
-
     }
 
     @Test
