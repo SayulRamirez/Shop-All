@@ -1,13 +1,21 @@
 package com.metaphorce.shop_all.services;
 
+import com.metaphorce.shop_all.domain.AddCartRequest;
 import com.metaphorce.shop_all.repositories.CartDetailsRepository;
 import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.ProductRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CartServiceImplTest {
@@ -26,4 +34,16 @@ public class CartServiceImplTest {
 
     @InjectMocks
     private CartServiceImpl underTest;
+
+    @Test
+    void whenAddProductTheUserNotExists() {
+
+        AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+
+        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(false);
+
+        assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
+        verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
+        verify(productRepository, never()).findById(any(Long.class));
+    }
 }
