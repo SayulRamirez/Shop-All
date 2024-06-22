@@ -1,6 +1,7 @@
 package com.metaphorce.shop_all.services;
 
 import com.metaphorce.shop_all.domain.AddCartRequest;
+import com.metaphorce.shop_all.domain.CartResponse;
 import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.CartDetails;
 import com.metaphorce.shop_all.entities.Product;
@@ -11,12 +12,10 @@ import com.metaphorce.shop_all.repositories.CartRepository;
 import com.metaphorce.shop_all.repositories.ProductRepository;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
@@ -86,7 +85,6 @@ public class CartServiceImplTest {
         verify(cartRepository, never()).findCartByUser(any(Long.class));
     }
 
-    // cuando el producto no esta en el carrito
     @Test
     void whenTheProductIsNotInTheCart() {
 
@@ -111,7 +109,6 @@ public class CartServiceImplTest {
         verify(cartDetailsRepository, times(1)).save(any(CartDetails.class));
     }
 
-    // cuando el producto ya esta en el carrito
     @Test
     void whenTheProductIsInTheCart() {
 
@@ -132,5 +129,22 @@ public class CartServiceImplTest {
         underTest.addProduct(request);
 
         verify(cartDetailsRepository, times(1)).save(any(CartDetails.class));
+    }
+
+    @Test
+    void whenTheyAskForGeneralCartDetails() {
+        Cart cart = Cart.builder()
+                .user(User.builder().name("juan").build())
+                .numberProducts(2)
+                .amount(45.42).build();
+
+        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
+
+        CartResponse response = underTest.getCart(1L);
+
+        assertEquals(cart.getUser().getName(), response.name());
+        assertEquals(cart.getNumberProducts(), response.number_products());
+        assertEquals(cart.getAmount(), response.amount());
     }
 }
