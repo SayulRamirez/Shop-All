@@ -43,7 +43,8 @@ public class CartServiceImpl implements CartService {
     @Override
     public void addProduct(AddCartRequest request) {
 
-        existsUser(request.user_id());
+        Cart cart = cartRepository.findById(request.user_id())
+                .orElseThrow(() -> new EntityNotFoundException("Cart not found whit user " + request.user_id()));
 
         Product product = productRepository.findById(request.product_id())
                 .orElseThrow(() -> new EntityNotFoundException("Product not found whit id: " + request.product_id()));
@@ -53,8 +54,6 @@ public class CartServiceImpl implements CartService {
         if (stock < request.pieces()) {
             throw new NotEnoughStockException("Not enough stock, only" + stock + " pieces");
         }
-
-        Cart cart = cartRepository.findCartByUser(request.user_id()).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
 
         Optional<Long> idCartDetails = cartDetailsRepository.getId(product.getId(), cart.getId());
 
@@ -84,8 +83,6 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponse getCart(Long userId) {
 
-        existsUser(userId);
-
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("User not found whit ID: " + userId));
 
         return new CartResponse(
@@ -98,13 +95,12 @@ public class CartServiceImpl implements CartService {
     @Override
     public List<CartDetailsResponse> getDetailsCart(Long userId) {
 
-        Long idCart = cartRepository.getIdByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
-
-        List<CartDetails> details = cartDetailsRepository.findCartDetailsByCartId(idCart);
+        Long idCart = userRepository
+                .findById(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found whit user: " + userId)).getCart().getId();
 
         List<CartDetailsResponse> response = new ArrayList<>();
 
-        details.forEach(d ->
+        cartDetailsRepository.findCartDetailsByCartId(idCart).forEach(d ->
                 response.add(new CartDetailsResponse(
                         d.getProduct().getDescription(),
                         d.getProduct().getCode(),
@@ -120,22 +116,15 @@ public class CartServiceImpl implements CartService {
     @Override
     public void deleteProduct(Long productId, Long userId) {
 
-        existsUser(userId);
+        Cart cart = cartRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("Cart not found whit user " + userId));
 
-        Cart cart = cartRepository.findCartByUser(userId).orElseThrow(() -> new EntityNotFoundException("Cart not found"));
-
-        Long cartDetailsId = cartDetailsRepository.getId(productId, cart.getId()).orElseThrow(() -> new EntityNotFoundException("cart details not found"));
+        Long cartDetailsId = cartDetailsRepository.getId(productId, cart.getId())
+                .orElseThrow(() -> new EntityNotFoundException("cart details not found"));
 
         cartDetailsRepository.deleteById(cartDetailsId);
 
         updateCart(cart);
-    }
-
-    private void existsUser(Long id) {
-
-        if (!userRepository.existsUserByIdAndActiveIsTrue(id)) {
-            throw new EntityNotFoundException("User not found");
-        }
     }
 
     private void updateCart(Cart cart) {
