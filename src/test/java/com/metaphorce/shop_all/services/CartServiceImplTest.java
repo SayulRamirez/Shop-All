@@ -88,7 +88,7 @@ public class CartServiceImplTest {
 
     // cuando el producto no esta en el carrito
     @Test
-    void whenTheProductIsNotIntTheCart() {
+    void whenTheProductIsNotInTheCart() {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
         Product product = Product.builder()
@@ -110,5 +110,27 @@ public class CartServiceImplTest {
 
         verify(cartDetailsRepository, times(1)).save(any(CartDetails.class));
     }
+
+    // cuando el producto ya esta en el carrito
+    @Test
+    void whenTheProductIsInTheCart() {
+
+        AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+        Product product = Product.builder()
+                .id(1L).stock(6).price(24.40).build();
+
+        Cart cart = Cart.builder().id(1L).user(User.builder().id(1L).build()).numberProducts(1).amount(24.40).build();
+
+        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+
+        when(productRepository.findById(any(Long.class))).thenReturn(Optional.of(product));
+
+        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
+
+        when(cartDetailsRepository.getId(any(Long.class), any(Long.class))).thenReturn(Optional.empty());
+
+        underTest.addProduct(request);
+
+        verify(cartDetailsRepository, times(1)).save(any(CartDetails.class));
+    }
 }
-// cuando el producto ya esta en el carrito
