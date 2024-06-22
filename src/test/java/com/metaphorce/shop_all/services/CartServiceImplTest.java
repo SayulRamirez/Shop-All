@@ -151,9 +151,8 @@ public class CartServiceImplTest {
         assertEquals(cart.getAmount(), response.amount());
     }
 
-    // obtener detalles del carrito vacio
     @Test
-    void whenTheyAskForGeneralCartDetailsUserNotExists() {
+    void whenYouGetTheCartDetailsAndTheyAreEmpty() {
 
         Long id = 1L;
         List<CartDetails> cartDetails = new ArrayList<>();
@@ -169,4 +168,6 @@ public class CartServiceImplTest {
     }
 
     // obtener detarlles del carrito con productos
+
 }
+
