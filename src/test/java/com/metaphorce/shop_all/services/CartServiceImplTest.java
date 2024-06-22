@@ -50,10 +50,10 @@ public class CartServiceImplTest {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(false);
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
-        verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
+        verify(cartRepository, times(1)).findById(any(Long.class));
         verify(productRepository, never()).findById(any(Long.class));
     }
 
@@ -62,12 +62,14 @@ public class CartServiceImplTest {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+        Cart cart = Cart.builder().build();
+
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
-        verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
+        verify(cartRepository, times(1)).findById(any(Long.class));
         verify(productRepository, times(1)).findById(any(Long.class));
         verify(cartRepository, never()).findCartByUser(any(Long.class));
     }
@@ -76,33 +78,35 @@ public class CartServiceImplTest {
     void whenThereIsInefficientStock() {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+
+        Cart cart = Cart.builder().build();
+
         Product product = Product.builder()
                         .id(1L).stock(2).build();
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.of(product));
 
         assertThrows(NotEnoughStockException.class, () -> underTest.addProduct(request));
-        verify(userRepository, times(1)).existsUserByIdAndActiveIsTrue(any(Long.class));
+        verify(cartRepository, times(1)).findById(any(Long.class));
         verify(productRepository, times(1)).findById(any(Long.class));
-        verify(cartRepository, never()).findCartByUser(any(Long.class));
+        verify(cartDetailsRepository, never()).getId(any(Long.class), any(Long.class));
     }
 
     @Test
-    void whenTheProductIsNotInTheCart() {
+    void whenTheProductIsInTheCart() {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+
         Product product = Product.builder()
                 .id(1L).stock(6).price(24.40).build();
 
         Cart cart = Cart.builder().id(1L).numberProducts(1).amount(24.40).build();
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.of(product));
-
-        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(cartDetailsRepository.getId(any(Long.class), any(Long.class))).thenReturn(Optional.of(1L));
 
@@ -114,19 +118,18 @@ public class CartServiceImplTest {
     }
 
     @Test
-    void whenTheProductIsInTheCart() {
+    void whenTheProductIsNotInTheCart() {
 
         AddCartRequest request = new AddCartRequest(1L, 1L, 3);
+
         Product product = Product.builder()
                 .id(1L).stock(6).price(24.40).build();
 
         Cart cart = Cart.builder().id(1L).numberProducts(1).amount(24.40).build();
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(productRepository.findById(any(Long.class))).thenReturn(Optional.of(product));
-
-        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(cartDetailsRepository.getId(any(Long.class), any(Long.class))).thenReturn(Optional.empty());
 
@@ -143,7 +146,6 @@ public class CartServiceImplTest {
 
         User user = User.builder().name("juan").cart(cart).build();
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
 
         CartResponse response = underTest.getCart(1L);
@@ -157,11 +159,14 @@ public class CartServiceImplTest {
     void whenYouGetTheCartDetailsAndTheyAreEmpty() {
 
         Long id = 1L;
+
+        User user = User.builder().id(1L).cart(Cart.builder().id(1L).build()).build();
+
         List<CartDetails> cartDetails = new ArrayList<>();
 
-        when(cartRepository.getIdByUser(any(Long.class))).thenReturn(Optional.of(id));
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-        when(cartDetailsRepository.findCartDetailsByCartId(id)).thenReturn(cartDetails);
+        when(cartDetailsRepository.findCartDetailsByCartId(any(Long.class))).thenReturn(cartDetails);
 
         List<CartDetailsResponse> responses = underTest.getDetailsCart(1L);
 
@@ -173,6 +178,9 @@ public class CartServiceImplTest {
     void whenYouGetTheCartDetailsIsSuccessful() {
 
         Long id = 1L;
+
+        User user = User.builder().id(1L).cart(Cart.builder().id(1L).build()).build();
+
         List<CartDetails> cartDetails = List.of(
                 CartDetails.builder()
                         .product(Product.builder().description("Heineken 355 ml lata")
@@ -186,9 +194,9 @@ public class CartServiceImplTest {
                         .amount(110.60).build()
         );
 
-        when(cartRepository.getIdByUser(any(Long.class))).thenReturn(Optional.of(id));
+        when(userRepository.findById(id)).thenReturn(Optional.of(user));
 
-        when(cartDetailsRepository.findCartDetailsByCartId(id)).thenReturn(cartDetails);
+        when(cartDetailsRepository.findCartDetailsByCartId(any(Long.class))).thenReturn(cartDetails);
 
         List<CartDetailsResponse> responses = underTest.getDetailsCart(1L);
 
@@ -222,11 +230,11 @@ public class CartServiceImplTest {
         cartRepository.save(cart);
         cartDetailsRepository.saveAll(cartDetails);
 
-        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
-
-        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
+        when(cartRepository.findById(any(Long.class))).thenReturn(Optional.of(cart));
 
         when(cartDetailsRepository.getId(1L, cart.getId())).thenReturn(Optional.of(1L));
+        when(cartDetailsRepository.sumAmount(any(Long.class))).thenReturn(Optional.of(110.60));
+        when(cartDetailsRepository.sumNumberProducts(any(Long.class))).thenReturn(Optional.of(1));
 
         underTest.deleteProduct(1L, 1L);
 
