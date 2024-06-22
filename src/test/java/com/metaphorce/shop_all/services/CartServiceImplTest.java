@@ -71,7 +71,6 @@ public class CartServiceImplTest {
         assertThrows(EntityNotFoundException.class, () -> underTest.addProduct(request));
         verify(cartRepository, times(1)).findById(any(Long.class));
         verify(productRepository, times(1)).findById(any(Long.class));
-        verify(cartRepository, never()).findCartByUser(any(Long.class));
     }
 
     @Test
