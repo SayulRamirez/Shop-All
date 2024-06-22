@@ -196,5 +196,44 @@ public class CartServiceImplTest {
         assertEquals(2, responses.size());
         verify(cartDetailsRepository, times(1)).findCartDetailsByCartId(any(Long.class));
     }
+
+    @Test
+    void whenDeleteProduct() {
+
+        Cart cart = Cart.builder()
+                .id(1L)
+                .user(User.builder().name("juan").build())
+                .numberProducts(3)
+                .amount(160.40).build();
+
+        List<CartDetails> cartDetails = List.of(
+                CartDetails.builder()
+                        .cart(cart)
+                        .product(Product.builder().description("Heineken 355 ml lata")
+                                .code("1234").category(Category.CERVEZA).build())
+                        .numberPieces(2)
+                        .amount(48.80).build(),
+                CartDetails.builder()
+                        .cart(cart)
+                        .product(Product.builder().description("Kosako 2 litros botella pet")
+                                        .code("8901").category(Category.CERVEZA).build())
+                        .numberPieces(1)
+                        .amount(110.60).build()
+        );
+        cartRepository.save(cart);
+        cartDetailsRepository.saveAll(cartDetails);
+
+        when(userRepository.existsUserByIdAndActiveIsTrue(any(Long.class))).thenReturn(true);
+
+        when(cartRepository.findCartByUser(any(Long.class))).thenReturn(Optional.of(cart));
+
+        when(cartDetailsRepository.getId(1L, cart.getId())).thenReturn(Optional.of(1L));
+
+        underTest.deleteProduct(1L, 1L);
+
+        verify(cartDetailsRepository, times(1)).deleteById(any(Long.class));
+        verify(cartDetailsRepository, times(1)).sumAmount(any(Long.class));
+        verify(cartDetailsRepository, times(1)).sumNumberProducts(any(Long.class));
+    }
 }
 
