@@ -17,10 +17,6 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cart_sequence")
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(name = "fk_user_cart"))
-    private User user;
-
     private Integer numberProducts;
 
     private Double amount;

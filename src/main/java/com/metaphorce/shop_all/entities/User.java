@@ -24,6 +24,10 @@ public class User {
 
     private boolean active;
 
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", foreignKey = @ForeignKey(name = "fk_cart_user"))
+    private Cart cart;
+
     @PrePersist
     public void prePersist() {
         this.active = true;
