@@ -65,6 +65,6 @@ public class ExceptionHandlerController {
                 .status(HttpStatus.UNPROCESSABLE_ENTITY)
                 .timestamp(ZonedDateTime.now(ZoneId.of("America/Chicago"))).build();
 
-        return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 }
