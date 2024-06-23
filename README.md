@@ -125,4 +125,29 @@ Parametros:
 
 Respuesta: 404
 
-### También se puede ver la documentación con swagger descargando el proyecto y entrando a la ruta "http://localhost:8080/swagger-ui/index.html" en el navegador y modificando el usuario y contraseña del usuario de la base de datos
+### 3. Controlador de productos
+
+#### :beer: :beer: Mostrar todos los productos disponibles usando la ruta "/api/v1/products"
+
+La ruta devolverá todos los productos de la tienda, como se muestra en el siguiente ejemplo:
+
+````
+[
+    {
+        "description": "Lambrusco 750 ml",
+        "category": "VINO",
+        "stock": 20,
+        "price": 138.4
+    },
+    {
+        "description": "Centenario reposado 750 ml botella",
+        "category": "TEQUILA",
+        "stock": 16,
+        "price": 310.74
+    }
+]
+````
+
+
+
+### También se puede ver la documentación con swagger descargando el proyecto e iniciandolo y entrando a la ruta "http://localhost:8080/swagger-ui/index.html" en el navegador y modificando el usuario y contraseña del usuario de la base de datos
