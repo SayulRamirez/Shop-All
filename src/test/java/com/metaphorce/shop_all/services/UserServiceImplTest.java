@@ -1,14 +1,11 @@
 package com.metaphorce.shop_all.services;
 
-import com.metaphorce.shop_all.domain.UserRequest;
 import com.metaphorce.shop_all.domain.UserResponse;
 import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.repositories.UserRepository;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -28,53 +25,6 @@ public class UserServiceImplTest {
 
     @InjectMocks
     private UserServiceImpl underTest;
-
-    @Test
-    void whenAUserRegisterTheParametersAreCorrect() {
-
-        // give
-        UserRequest request = new UserRequest("juan", "juan1234@example.com");
-
-        User user = User.builder().id(1L).name(request.name()).email(request.email()).active(true).build();
-        // when
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        underTest.register(request);
-
-        // that
-        ArgumentCaptor<User> argumentCaptor = ArgumentCaptor.forClass(User.class);
-        verify(userRepository).save(argumentCaptor.capture());
-
-        User requestCaptured = argumentCaptor.getValue();
-
-        assertEquals(user.getName(), requestCaptured.getName());
-        assertEquals(user.getEmail(), requestCaptured.getEmail());
-    }
-
-    @Test
-    void whenRegistrationIsSuccessful() {
-        UserRequest request = new UserRequest("juan", "juan1234@example.com");
-
-        User user = User.builder().name(request.name()).email(request.email()).build();
-
-        when(userRepository.save(any(User.class))).thenReturn(user);
-
-        UserResponse response = underTest.register(request);
-
-        assertEquals(user.getName(), response.name());
-        assertEquals(user.getEmail(), response.email());
-
-        verify(userRepository, times(1)).save(any(User.class));
-    }
-
-    @Test
-    void whenTheUserAlreadyExists() {
-        UserRequest request = new UserRequest("repeated", "juan1234@example.com");
-
-        when(userRepository.existsByEmail(request.email())).thenReturn(true);
-
-        assertThrows(EntityExistsException.class, () -> underTest.register(request));
-        verify(userRepository, times(1)).existsByEmail(any(String.class));
-    }
 
     @Test
     void whenGetAllUsersIsEmpty() {

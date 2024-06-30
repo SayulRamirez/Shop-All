@@ -1,11 +1,9 @@
 package com.metaphorce.shop_all.controllers;
 
-import com.metaphorce.shop_all.domain.UserRequest;
 import com.metaphorce.shop_all.domain.UserResponse;
 import com.metaphorce.shop_all.services.UserServiceImpl;
 import com.metaphorce.shop_all.services.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -29,16 +27,6 @@ public class UserController {
     @GetMapping("/getAll")
     public ResponseEntity<List<UserResponse>> getAll() {
         return ResponseEntity.ok(userService.getAll());
-    }
-
-    @Operation(summary = "Register a new user", description = "Register a new user and return the registered user, if the user already has the email registered an error will be thrown",
-            responses = {@ApiResponse(description = "If the data sent is not correctly formulated", responseCode = "400", content = @Content),
-                    @ApiResponse(description = "If the user already exists in the database", responseCode = "409", content = @Content),
-                    @ApiResponse(description = "If the user not exists in the database and the register is successful", responseCode = "200")
-            })
-    @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody UserRequest request) {
-        return ResponseEntity.ok(userService.register(request));
     }
 
     @Operation(summary = "Inactivate a user", description = "It eliminates or rather makes the user inactive by means of their id, if it does not find it it will throw an error.",

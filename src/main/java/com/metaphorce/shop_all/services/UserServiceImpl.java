@@ -1,12 +1,9 @@
 package com.metaphorce.shop_all.services;
 
-import com.metaphorce.shop_all.domain.UserRequest;
 import com.metaphorce.shop_all.domain.UserResponse;
-import com.metaphorce.shop_all.entities.Cart;
 import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import com.metaphorce.shop_all.services.interfaces.UserService;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,23 +30,6 @@ public class UserServiceImpl implements UserService {
                 .forEach(user -> response.add(new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isActive())));
 
         return response;
-    }
-
-    @Transactional
-    @Override
-    public UserResponse register(UserRequest request) {
-
-        if (userRepository.existsByEmail(request.email())) {
-            throw new EntityExistsException("User already exists");
-        }
-
-        User user = userRepository.save(
-                User.builder()
-                        .name(request.name())
-                        .email(request.email())
-                        .cart(Cart.builder().build()).build());
-
-        return new UserResponse(user.getId(), user.getName(), user.getEmail(), user.isActive());
     }
 
     @Transactional
