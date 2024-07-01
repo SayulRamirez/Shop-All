@@ -34,6 +34,10 @@ public class SecurityConfiguration {
 
                     request.requestMatchers(HttpMethod.POST, "/auth/**").permitAll();
 
+                    request.requestMatchers(HttpMethod.GET, "/api/v1/user/getAll").hasRole("ADMIN");
+
+                    request.requestMatchers(HttpMethod.GET, "api/v1/products").permitAll();
+
                     request.anyRequest().authenticated();
                 })
                 .sessionManagement(
