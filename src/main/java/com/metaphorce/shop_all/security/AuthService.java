@@ -8,6 +8,10 @@ import com.metaphorce.shop_all.entities.Role;
 import com.metaphorce.shop_all.entities.User;
 import com.metaphorce.shop_all.repositories.UserRepository;
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -20,15 +24,24 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public AuthService(UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder) {
+    private final AuthenticationManager authenticationManager;
+
+    public AuthService(UserRepository userRepository, JwtService jwtService, PasswordEncoder passwordEncoder, AuthenticationManager authenticationManager) {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationManager = authenticationManager;
     }
 
     public AuthResponse login(LoginRequest request) {
 
-        return new AuthResponse(request.toString());
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.email(), request.password()));
+
+        UserDetails user = userRepository.findByEmail(request.email()).orElseThrow(() -> new EntityNotFoundException("Not exists user whit email " + request.email()));
+
+        String token = jwtService.getToken(user);
+
+        return new AuthResponse(token);
     }
 
     public AuthResponse register(UserRequest request) {
