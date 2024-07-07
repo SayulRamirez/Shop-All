@@ -36,6 +36,10 @@ public class SecurityConfiguration {
 
                     request.requestMatchers(HttpMethod.GET, "/api/v1/user/getAll").hasAuthority("ADMIN");
 
+                    request.requestMatchers(HttpMethod.PUT, "api/v1/products/restock").hasAuthority("ADMIN");
+
+                    request.requestMatchers(HttpMethod.POST, "api/v1/products/register").hasAuthority("ADMIN");
+
                     request.requestMatchers(HttpMethod.GET, "/api/v1/products").permitAll();
 
                     request.anyRequest().authenticated();
