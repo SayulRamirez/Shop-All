@@ -218,6 +218,46 @@ La ruta devolverá todos los productos de la tienda, como se muestra en el sigui
 > [!IMPORTANT]
 > El token generado en el login deberá ser enviado en el header de la petición.
 
+#### :beer:  Resurtir las existencias de los productos usando la ruta "/api/v1/products/restock"
+
+La ruta devolverá un código NOT_FOUND (404) si el producto no existe en el inventario y devolverá 
+un código OK (200) si la operación se realizó correctamente
+
+Se deberá de enviar en el body de la petición el código del producto y el número de piezas que se agregaran,
+como se muestra en el siguiente ejemplo.
+
+````
+{
+  "code": "1234"
+  "stock": 20,
+}
+````
+
+> [!IMPORTANT]
+> El token generado en el login deberá ser enviado en el header de la petición.
+
+
+#### :beer:  Agregar un producto nuevo al inventario usando la ruta "/api/v1/products/register"
+
+La ruta devolverá un código CONFLICT (409) si el código del producto ya esta en uso y devolverá
+un código OK (200) si la operación se realizó correctamente
+
+Se deberá de enviar en el body de la petición la descripción, el código, la categoria, el número existencias y el precio 
+del producto que se registrara, como se muestra en el siguiente ejemplo.
+
+````
+{
+  "description": "Jose cuervo",
+  "code": "314121",
+  "category": "TEQUILA",
+  "stock": 12,
+  "price": 1243.2
+}
+````
+
+> [!IMPORTANT]
+> El token generado en el login deberá ser enviado en el header de la petición.
+
 ----
 
 ### Tests
