@@ -1,9 +1,11 @@
 package com.metaphorce.shop_all.controllers;
 
+import com.metaphorce.shop_all.domain.ProductRegisterRequest;
 import com.metaphorce.shop_all.domain.ProductResponse;
 import com.metaphorce.shop_all.domain.RestockRequest;
 import com.metaphorce.shop_all.services.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +33,7 @@ public class ProductController {
     }
 
     @Operation(summary = "Restock the stock of the products",
-            responses = {@ApiResponse(description = "If the producto was not found", responseCode = "404"),
+            responses = {@ApiResponse(description = "If the product was not found", responseCode = "404"),
                     @ApiResponse(description = "If the operation is successful", responseCode = "200")},
             security = @SecurityRequirement(name = "bearerAuth"))
     @PutMapping("/restock")
@@ -40,6 +42,15 @@ public class ProductController {
         productService.restock(request);
 
         return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Register new products",
+            responses = {@ApiResponse(description = "if the product exists", responseCode = "409", content = @Content),
+                    @ApiResponse(description = "if it successfully registered", responseCode = "200")},
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @PostMapping("/register")
+    public ResponseEntity<ProductResponse> registerProduct(@RequestBody ProductRegisterRequest request) {
+        return ResponseEntity.ok(productService.registerProduct(request));
     }
 
 }
