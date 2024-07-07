@@ -1,13 +1,13 @@
 package com.metaphorce.shop_all.controllers;
 
 import com.metaphorce.shop_all.domain.ProductResponse;
+import com.metaphorce.shop_all.domain.RestockRequest;
 import com.metaphorce.shop_all.services.ProductServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,4 +29,17 @@ public class ProductController {
     public ResponseEntity<List<ProductResponse>> showProducts() {
         return ResponseEntity.ok(productService.getAll());
     }
+
+    @Operation(summary = "Restock the stock of the products",
+            responses = {@ApiResponse(description = "If the producto was not found", responseCode = "404"),
+                    @ApiResponse(description = "If the operation is successful", responseCode = "200")},
+            security = @SecurityRequirement(name = "bearerAuth"))
+    @PutMapping("/restock")
+    public ResponseEntity<Void> restock(@RequestBody RestockRequest request) {
+
+        productService.restock(request);
+
+        return ResponseEntity.ok().build();
+    }
+
 }
