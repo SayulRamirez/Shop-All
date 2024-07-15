@@ -263,13 +263,15 @@ del producto que se registrara, como se muestra en el siguiente ejemplo.
 ### Tests
 
 La aplición cuenta con test unitarios usando JUnit y Mockito de los servicios de la aplicaión
-
+* Reposirtory.
+* Service.
 ----
 
-> [!NOTE] También se puede ver la documentación con swagger descargando el proyecto e iniciandolo y 
+> [!NOTE] 
+> También se puede ver la documentación con swagger descargando el proyecto e iniciandolo y 
 > entrando a la ruta "http://localhost:8080/swagger-ui/index.html" en el navegador y modificando el 
 > usuario y contraseña del usuario de la base de datos en el archivo properties de la aplicación.
 > cambiando las siguientes proiedades:
-> spring.datasource.url=jdbc:mysql://localhost:3306/nombre_de_la_base_de_datos
-> spring.datasource.username=usuario_de_la_base_de_datos
-> spring.datasource.password=contraseña_de_acceso
+> "spring.datasource.url=jdbc:mysql://localhost:3306/nombre_de_la_base_de_datos"
+> "spring.datasource.username=usuario_de_la_base_de_datos"
+> "spring.datasource.password=contraseña_de_acceso"
